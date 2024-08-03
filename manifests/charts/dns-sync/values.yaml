@@ -1,0 +1,16 @@
+image:
+  repository: costinm
+  tag: latest
+  pullPolicy: Always
+
+env: []
+
+# -- Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`.
+extraVolumes: []
+
+# -- Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `external-dns` container.
+extraVolumeMounts: []
+
+# -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `external-dns` container.
+resources: {}
+

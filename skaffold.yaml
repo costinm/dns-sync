@@ -1,0 +1,37 @@
+# skaffold dev --port-forward=pods --cleanup=true
+apiVersion: skaffold/v4beta3
+kind: Config
+metadata:
+  name:	dns-sync
+
+build:
+  tagPolicy:
+    dateTime:
+      format: "20060102%H%M%S"
+
+  artifacts:
+    - context: .
+      image: costinm/dns-sync
+      ko:
+      #custom:
+      #  buildCommand: make push REGISTRY=costinm
+        dependencies:
+          paths:
+            - Makefile
+            - pkg/**
+            - provider/**
+            - source/**
+            - plan/**
+            - endpoint/**
+            - internal/**
+            - controller/**
+            - "*.go"
+
+deploy:
+  helm:
+    releases:
+      - chartPath: manifests/charts/dns-sync
+        name: dns-sync
+        namespace: dns-system
+
+

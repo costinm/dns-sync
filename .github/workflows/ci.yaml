@@ -1,0 +1,36 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
+jobs:
+  build:
+    permissions:
+      contents: read  #  to fetch code (actions/checkout)
+      checks: write  #  to create a new check based on the results (shogo82148/actions-goveralls)
+
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.4'
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+    - name: Install CI
+      run: |
+        go get -v -t -d ./...
+
+    - name: Test
+      run: make test

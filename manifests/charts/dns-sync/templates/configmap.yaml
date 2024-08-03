@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+data:
+  dnssync.yaml: |-
+    metricsAddress: ":15020"
+
+    sync:
+      google:
+        policy: create-only
+        address: "http://dns:8080/google"
+        protocol: webhook
+        txtPrefix: "sync_"
+        txtOwnerID: "dnssync"
+        sources:
+          - name: node
+            suffix: ".nodes.i.webinf.info"
+          - name: istio-se
+
+      k8s:
+        domain: ""
+        protocol: "inmemory"
+        txtPrefix: "sync_"
+        txtOwnerID: "dnssync"
+        sources:
+          #      - name: k8s
+          - name: istio-se
+          - name: node
+            suffix: ".nodes.cluster-example.mesh.internal"
+          - name: service
+            fqdnTemplate: ".services.cluster-example.mesh.internal"
+          - name: pod
+            fqdnTemplate: ".pods.cluster-example.mesh.internal"
+          - name: gateway
+          - name: istio-gateway
+          #- name: crd
