@@ -33,6 +33,23 @@ endif
 crd: controller-gen
 	${CONTROLLER_GEN} crd:crdVersions=v1 paths="./endpoint/..." paths="./pkg/apis/..." output:crd:stdout > manifests/crd.yaml
 
+GIT?=github.com/costinm
+
+# GIT PKG (top level)
+GITPKG?=${GIT}/dns-sync
+
+# Must be done after register
+client-gen:
+	register-gen ./pkg/apis/dnssync/v1
+	deepcopy-gen ./pkg/apis/dnssync/v1
+	client-gen \
+    --fake-clientset=false \
+    --clientset-name "clientset" \
+    --input-base ${GITPKG} \
+    --output-dir ./gen-client \
+    --input pkg/apis/dnssync/v1 \
+     --output-pkg ${GITPKG}/gen-client
+
 # The verify target runs tasks similar to the CI tasks, but without code coverage
 .PHONY: test
 test:
