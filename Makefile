@@ -31,7 +31,7 @@ endif
 # generates CRD using controller-gen
 .PHONY: crd
 crd: controller-gen
-	${CONTROLLER_GEN} crd:crdVersions=v1 paths="./endpoint/..." output:crd:stdout > manifests/crd.yaml
+	${CONTROLLER_GEN} crd:crdVersions=v1 paths="./endpoint/..." paths="./pkg/apis/..." output:crd:stdout > manifests/crd.yaml
 
 # The verify target runs tasks similar to the CI tasks, but without code coverage
 .PHONY: test
