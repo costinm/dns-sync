@@ -1,7 +1,6 @@
 package tel
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -24,6 +23,6 @@ func ServeMetrics() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/stats/prometheus", promhttp.Handler())
 
-	go log.Fatal(http.ListenAndServe(address, nil))
+	go http.ListenAndServe(address, nil)
 }
 

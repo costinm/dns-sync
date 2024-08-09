@@ -9,7 +9,7 @@ data:
     sync:
       google:
         policy: create-only
-        address: "http://dns:8080/google"
+        address: "http://127.0.0.1:8080/google"
         protocol: webhook
         txtPrefix: "sync_"
         txtOwnerID: "dnssync"
@@ -17,8 +17,10 @@ data:
           - name: node
             suffix: ".nodes.i.webinf.info"
           - name: istio-se
+          - name: node
+            suffix: ".crmesh.internal"
 
-      k8s:
+    k8s:
         domain: ""
         protocol: "inmemory"
         txtPrefix: "sync_"

@@ -2,19 +2,46 @@ package v1
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+
+
+// DNSRecord represents a CR that has host and IP information to program in DNS.
+// It 'happens' to match Istio ServiceEntry - but it is intended as a pattern, more fields can be added to match other
+// ways to represent the host and address info.
+//
+// Labels must be used to opt-in specific 'frontend' resources - it should never be expected that all ServiceEntries
+// have frontend role by default.
+//
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-// RecordSource represents a pattern for representing DNS addresses and hostnames in a resource.
-// It is not meant to be used standalone - but can be used to unmarshall other resources, like an interface or
-// parent class.
-//
 // +k8s:openapi-gen=true
 // +groupName=dns-resource
 // +kubebuilder:resource:path=dns-resources
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +versionName=v1
+type DNSRecord struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// Records using standard syntax.
+	RawRecords []string `json:"dns,omitempty"`
+
+	Spec   ServiceEntrySpec   `json:"spec,omitempty"`
+	Status ServiceEntryStatus `json:"status,omitempty"`
+}
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +kubebuilder:object:root=true
+// DNSEndpointList is a list of DNSRecord objects
+type DNSRecordList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []DNSRecord `json:"items"`
+}
+
+
+// Must be named types.go (for consistency)
 
 type Port struct {
 	Name string `json:"name,omitempty"`
@@ -57,28 +84,4 @@ type ServiceEntryStatus struct {
 	Addresses []Address `json:"addresses,omitempty"`
 }
 
-// DNSRecord represents a CR that has host and IP information to program in DNS.
-// It 'happens' to match Istio ServiceEntry - but it is intended as a pattern, more fields can be added to match other
-// ways to represent the host and address info.
-//
-// Labels must be used to opt-in specific 'frontend' resources - it should never be expected that all ServiceEntries
-// have frontend role by default.
-type DNSRecord struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	// Records using standard syntax.
-	RawRecords []string `json:"dns,omitempty"`
-
-	Spec   ServiceEntrySpec   `json:"spec,omitempty"`
-	Status ServiceEntryStatus `json:"status,omitempty"`
-}
-
-// +kubebuilder:object:root=true
-// DNSEndpointList is a list of DNSRecord objects
-type DNSRecordList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []DNSRecord `json:"items"`
-}
 

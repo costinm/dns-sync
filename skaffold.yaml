@@ -23,7 +23,6 @@ build:
             - source/**
             - plan/**
             - endpoint/**
-            - internal/**
             - controller/**
             - "*.go"
 
@@ -31,7 +30,7 @@ deploy:
   helm:
     releases:
       - chartPath: manifests/charts/dns-sync
-        name: dns-sync
+        name: dns-sync1
         namespace: dns-system
 
 

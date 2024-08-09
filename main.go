@@ -18,6 +18,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -62,10 +63,15 @@ func main() {
 		return
 	}
 
+	fmt.Println("Starting dns-sync")
 	// No need to register metrics or signal handling if we're running in once mode.
 	// TODO: switch to OTel, generate traces too
-	tel.ServeMetrics()
+	go tel.ServeMetrics()
+	fmt.Println("Starting dns-sync1")
+
 	err := dns_sync.LoadAndRun(ctx,  false)
+	fmt.Println("Starting dns-sync2")
+
 	if err != nil {
 		log.Fatal(err)
 	}

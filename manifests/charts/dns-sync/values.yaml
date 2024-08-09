@@ -14,3 +14,7 @@ extraVolumeMounts: []
 # -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `external-dns` container.
 resources: {}
 
+extraContainers:
+  - image: costinm/dns-sync-gcp:latest
+    name: dns-sync-gcp
+    env: []

@@ -15,23 +15,10 @@
 .PHONY: cover cover-html
 .DEFAULT_GOAL := build
 
-# find or download controller-gen
-# download controller-gen if necessary
-controller-gen:
-ifeq (, $(shell which controller-gen))
-	@{ \
-	set -e ;\
-	go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.15.0 ;\
-	}
-CONTROLLER_GEN=$(GOBIN)/controller-gen
-else
-CONTROLLER_GEN=$(shell which controller-gen)
-endif
-
 # generates CRD using controller-gen
 .PHONY: crd
-crd: controller-gen
-	${CONTROLLER_GEN} crd:crdVersions=v1 paths="./endpoint/..." paths="./pkg/apis/..." output:crd:stdout > manifests/crd.yaml
+crd:
+	controller-gen crd:crdVersions=v1 paths="./endpoint/..." paths="./pkg/apis/..." output:crd:stdout > manifests/crd.yaml
 
 GIT?=github.com/costinm
 
@@ -39,16 +26,45 @@ GIT?=github.com/costinm
 GITPKG?=${GIT}/dns-sync
 
 # Must be done after register
-client-gen:
+code-gen:
 	register-gen ./pkg/apis/dnssync/v1
 	deepcopy-gen ./pkg/apis/dnssync/v1
+
+client-gen:
+	# Does the same thing: controller-gen +object paths=./pkg/apis/dnssync/v1
 	client-gen \
     --fake-clientset=false \
-    --clientset-name "clientset" \
+    --clientset-name "dnssync" \
     --input-base ${GITPKG} \
     --output-dir ./gen-client \
     --input pkg/apis/dnssync/v1 \
      --output-pkg ${GITPKG}/gen-client
+
+lister-gen:
+	rm -rf gen-client/dnssynccache
+	lister-gen  \
+      --output-pkg "${GITPKG}/gen-client/dnssynccache" \
+      --output-dir "./gen-client/dnssynccache" \
+         "./pkg/apis/dnssync/v1"
+
+informer-gen:
+	# single-directory - generate only external version, for client
+	informer-gen \
+        --output-dir "./gen-client/dnssyncinformers" \
+        --listers-package "${GITPKG}/gen-client/dnssynccache" \
+        --single-directory \
+        --versioned-clientset-package "${GITPKG}/gen-client/dnssync" \
+        --output-pkg "${GITPKG}/gen-client/dnssyncinformers" \
+        ${COMMON_FLAGS} \
+           "./pkg/apis/dnssync/v1"
+
+
+deps:
+	go install github.com/google/ko@v0.14.1
+	go install k8s.io/code-generator/cmd/lister-gen
+	go install k8s.io/code-generator/cmd/client-gen
+	go install k8s.io/code-generator/cmd/informer-gen
+
 
 # The verify target runs tasks similar to the CI tasks, but without code coverage
 .PHONY: test
@@ -93,3 +109,4 @@ clean:
 
 ci:
 	go get -v -t -d ./...
+

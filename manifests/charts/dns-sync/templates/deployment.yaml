@@ -13,7 +13,7 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
-      serviceAccountName: dns-sync
+      serviceAccountName: {{ .Release.Name }}
 
       shareProcessNamespace: true
       terminationGracePeriodSeconds: 5
@@ -66,6 +66,20 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
+        {{ if .Values.extraContainers }}
+        {{- range .Values.extraContainers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          env:
+            {{- toYaml .env | nindent 12 }}
+          {{- if .resources }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
 
       volumes:
         - name: cfg

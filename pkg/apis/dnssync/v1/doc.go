@@ -17,7 +17,7 @@ limitations under the License.
 // Package v1 contains API Schema definitions for the dns-sync.io API group.
 //
 // +kubebuilder:object:generate=true
-// +groupName=dns-sync.costinm.github.com
+// +groupName=dnssync.costinm.github.com
 // +versionName=v1
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen=package

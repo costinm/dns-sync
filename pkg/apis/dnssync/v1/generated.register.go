@@ -12,7 +12,7 @@ import (
 )
 
 // GroupName specifies the group name used to register the objects.
-const GroupName = "dns-sync.costinm.github.com"
+const GroupName = "dnssync.costinm.github.com"
 
 // GroupVersion specifies the group and the version used to register the objects.
 var GroupVersion = v1.GroupVersion{Group: GroupName, Version: "v1"}

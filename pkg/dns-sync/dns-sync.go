@@ -2,20 +2,20 @@ package dns_sync
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
 
 	"github.com/costinm/dns-sync/controller"
 	"github.com/costinm/dns-sync/endpoint"
+	"github.com/costinm/dns-sync/pkg/config"
 	"github.com/costinm/dns-sync/pkg/mem"
 	"github.com/costinm/dns-sync/pkg/sources/dnsmesh"
 	"github.com/costinm/dns-sync/plan"
 	"github.com/costinm/dns-sync/provider/webhook"
 	"github.com/costinm/dns-sync/source"
 	"k8s.io/apimachinery/pkg/labels"
-	"sigs.k8s.io/yaml"
 )
 
 // Configure the sync controllers.
@@ -26,11 +26,9 @@ type DNSSync struct {
 }
 
 func LoadAndRun(ctx context.Context, once bool) error {
-	dnsSyncCfg := &endpoint.ExtDNSConfig{}
-
-	cfgB, err := os.ReadFile("dnssync.yaml")
+	dnsSyncCfg, err := config.Get[endpoint.ExtDNSConfig](ctx, "dnssync")
 	if err != nil {
-		slog.Warn("Missing config, will use default", "err", err)
+		fmt.Println("Missing config, will use default", "err", err)
 		// Use an in-memory config that will show all entries.
 		dnsSyncCfg.Sync = map[string]*endpoint.SyncConfig {
 			"inmemory": &endpoint.SyncConfig{
@@ -43,15 +41,6 @@ func LoadAndRun(ctx context.Context, once bool) error {
 				},
 			},
 		}
-
-	} else {
-		err = yaml.Unmarshal(cfgB, dnsSyncCfg)
-		if err != nil {
-			log.Fatal("Failed to parse config`", err)
-		}
-
-		revB, _ := yaml.Marshal(dnsSyncCfg)
-		log.Println("config: ", string(revB))
 	}
 	return Run(ctx, dnsSyncCfg, once)
 }
