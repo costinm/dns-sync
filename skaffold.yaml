@@ -9,22 +9,31 @@ build:
     dateTime:
       format: "20060102%H%M%S"
 
+
+
   artifacts:
     - context: .
       image: costinm/dns-sync
-      ko:
-      #custom:
-      #  buildCommand: make push REGISTRY=costinm
-        dependencies:
-          paths:
-            - Makefile
-            - pkg/**
-            - provider/**
-            - source/**
-            - plan/**
-            - endpoint/**
-            - controller/**
-            - "*.go"
+      buildpacks:
+        builder: gcr.io/buildpacks/builder:v1
+#    - context: .
+#      image: costinm/dns-sync
+#      sync:
+#         # auto is default for buildpacks and JIB
+#         auto: {}
+#      ko:
+#      #custom:
+#      #  buildCommand: make push REGISTRY=costinm
+#        dependencies:
+#          paths:
+#            - Makefile
+#            - pkg/**
+#            - provider/**
+#            - source/**
+#            - plan/**
+#            - endpoint/**
+#            - controller/**
+#            - "*.go"
 
 deploy:
   helm:
@@ -34,3 +43,4 @@ deploy:
         namespace: dns-system
 
 
+# Automatic file-syncing and hot reloading are enabled by default when you're working with Buildpacks as your preferred builder. For other builders like Docker, you can specify a sync section in your skaffold.yaml file for the artifact you're customizing.
